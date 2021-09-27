@@ -1,13 +1,19 @@
-## Run command
-`ansible -i inventory example -m <command> -u <user>` with an inventory file that looks like that :
-```
+# Ansible introduction
+
+`ansible -i inventory example -m <command> -u <user>` lancer une commande avec le fichier inventory suivant :
+
+```ini
 [example]
 <ip_address>
 ```
-* Config file ansible.cfg : 
-```
+
+* Config file ansible.cfg :
+
+```ini
 [defaults]
 INVENTORY = inventory
 ```
+
 ## Run ad-hoc command
-* Example: `ansible example -a "free -h" -u <user>` 
+
+* Example: `ansible example -a "free -h" -u <user>`
