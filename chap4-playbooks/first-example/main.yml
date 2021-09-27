@@ -1,0 +1,47 @@
+Include your documentation here
+---
+- name: Install Apache.
+  hosts: all
+  become: true # Will run as root user for ALL THE PLAYBOOK
+
+  tasks:
+    - name: Install Apache.
+      yum: 
+        name:
+          - httpd
+          - httpd-devel
+        state: present
+      # It is also possible to run yum as a command
+      # command: yum install --quiet -y httpd httpd-devel
+      # - name: Copy configuration files.
+      # possible to run shell via yaml :
+      # shell: | <= used to merge several lines with \n
+      #   your shell command 1
+      #   your shell command 2
+      #   ...
+      #
+    - name: Copy configuration files.
+      copy:
+        src: "{{ item.src }}" # jinja template, it's also possible to use item["src"]
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: 0644
+      with_items: # With_items will be passed to copy
+        - src: httpd.conf
+          dest: /etc/httpd/cong/httpd.conf
+        - src: httpd-vhosts.conf
+          dest: /etc/httpd/conf/httpd.conf  
+    - name: Ensure Apache is started now and at boot.
+      service:
+        name: httpd
+        state: started
+        enabled: true
+    # The above syntax wraps the behavior expected below
+    #   command: > # '>' <= Used to merge several commands with space for the "command"
+    #     cp httpd.conf /etc/httpd/conf/httpd-vhosts.conf 
+    # - command: >
+    #     cp httpd-vhosts /etc/httpd/conf/httpd-vhosts.conf
+    # - name: Start Apache and configure it to run at boot
+    #   command: service httpd start
+    # - command: chkconfig httpd on
