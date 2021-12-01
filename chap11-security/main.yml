@@ -1,0 +1,36 @@
+- hosts: target
+  handlers:
+  # Note: Use 'sshd' for Red Hat and its derivatives.
+    - name: restart ssh
+      service: name=ssh state=restarted
+  tasks:
+    - name: Update SSH configuration to be more secure.
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+        validate: 'sshd -t -f %s'
+  with_items:
+    - regexp: "^PasswordAuthentication"
+      line: "PasswordAuthentication no"
+    - regexp: "^PermitRootLogin"
+      line: "PermitRootLogin no"
+    - regexp: "^Port"
+      line: "Port 2849"
+  notify: restart ssh
+
+- name: Add sudo rights for deployment user.
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: '^neo'
+    line: 'neo ALL=(ALL) NOPASSWD: ALL'
+    state: present
+    validate: 'visudo -cf %s'
+
+- name: Remove unused packages.
+  package:
+    name:
+    - sendmail
+  state: absent
+  purge: yes
